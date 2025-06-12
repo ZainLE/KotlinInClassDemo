@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="firstscreen_text">This is a showcase app using Jetpack Compose with the Unsplash API</string>
 </resources>
