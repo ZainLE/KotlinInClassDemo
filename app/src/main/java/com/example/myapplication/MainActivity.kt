@@ -64,9 +64,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun StatsScreen(onNext: () -> Unit) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Black)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -104,19 +106,21 @@ fun StatsScreen(onNext: () -> Unit) {
                 )
             }
         }
+
         Row(
-            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.circleimage),
                 contentDescription = "User Image",
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
                     .size(40.dp)
                     .clip(CircleShape),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
 
             Text(
@@ -125,37 +129,52 @@ fun StatsScreen(onNext: () -> Unit) {
 //                modifier = Modifier.padding(start = 8.dp)
             )
 
-            Row(modifier = Modifier.padding(horizontal = 30.dp)) {
-                Image(
-                    painter = painterResource(R.drawable.ic_download),
-                    contentDescription = "Download",
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .size(26.dp)
-                )
-                Image(
-                    painter = painterResource(R.drawable.ic_heart),
-                    contentDescription = "Heart",
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .size(26.dp)
+            Row() {
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+//                    modifier = Modifier.padding(horizontal = 5.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_download),
+                        contentDescription = "Download",
+                        modifier = Modifier
+                            .size(26.dp)
+                    )
+                }
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+//                    modifier = Modifier.padding(horizontal = 5.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_heart),
+                        contentDescription = "Heart",
+                        modifier = Modifier
+                            .size(26.dp)
 
-                )
-                Image(
-                    painter = painterResource(R.drawable.ic_bookmark),
-                    contentDescription = "Bookmark",
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .size(26.dp)
-                )
+                    )
+                }
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+//                    modifier = Modifier.padding(horizontal = 5.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_bookmark),
+                        contentDescription = "Bookmark",
+                        modifier = Modifier
+                            .size(32.dp)
+                    )
+                }
             }
         }
 
         HorizontalDivider(
             modifier = Modifier
                 .padding(bottom = 32.dp)
-                .padding(horizontal = 32.dp)
-                .padding(top = 20.dp),
+                .padding(horizontal = 32.dp),
+//                .padding(top = 20.dp),
             thickness = 1.dp,
             color = Color.DarkGray
         )
@@ -225,8 +244,10 @@ fun StatsScreen(onNext: () -> Unit) {
             color = Color.DarkGray
         )
 
-        Spacer(Modifier.weight(1f))
-        Row {
+//        Spacer(Modifier.weight(1f))
+
+        Row (modifier = Modifier
+            .padding(start = 16.dp, end = 26.dp)){
             // Next button
             Button(
                 onClick = onNext,
