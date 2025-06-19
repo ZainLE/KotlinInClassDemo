@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="bcn_description">Barcelona</string>
     <string name="firstscreen_text">This is a showcase app using Jetpack Compose with the Unsplash API</string>
+    <string name="description_search">Search icon</string>
+    <string name="main_search_hint">Search…</string>
+    <string name="description_image">This is an image of Barcelona</string>
 
     <string name="camera">Camera</string>
     <string name="camera_model">Nikon D3200</string>

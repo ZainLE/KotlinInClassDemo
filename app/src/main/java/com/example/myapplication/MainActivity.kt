@@ -1,339 +1,105 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.myapplication.api.UnsplashProvider
+import com.example.myapplication.data.UnsplashItem
+import com.example.myapplication.data.cb.UnsplashResult
+import com.example.myapplication.ui.theme.AboutScreen
+import com.example.myapplication.ui.theme.DetailsScreen
+import com.example.myapplication.ui.theme.MainScreen
+import com.example.myapplication.ui.theme.UnsplashTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), UnsplashResult {
+
+    lateinit var images: MutableState<List<UnsplashItem>>
+
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val provider = UnsplashProvider()
+        provider.fetchPhotos(this)
+
         setContent {
-            MyApplicationTheme {
-                val navController = rememberNavController()
-                Scaffold { inner ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = "first",
-                        modifier = Modifier.padding(inner)
+            UnsplashTheme {
+
+                images = remember { mutableStateOf(emptyList()) }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(stringResource(R.string.app_name))
+                            }
+                        )
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = { Toast.makeText(this@MainActivity, "I ❤️Android", Toast.LENGTH_SHORT).show() }
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Add"
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier.padding(innerPadding),
                     ) {
-                        composable("first") { StatsScreen(onNext = { navController.navigate("second") }) }
-                        composable("second") { SecondScreen(onBack = { navController.popBackStack() }) }
+                        MainScreen(
+                            images = images.value,
+                            onAction = { image ->
+                                val intent = Intent(this@MainActivity, DetailsActivity::class.java)
+                                intent.putExtra("image", image)
+                                startActivity(intent)
+                            }
+                        )
                     }
                 }
             }
         }
     }
-}
 
-@Composable
-fun StatsScreen(onNext: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-        ) {
+    override fun onDataFetchedSuccess(images: List<UnsplashItem>) {
+        this.images.value = images
+    }
 
-            Image(
-                painter = painterResource(id = R.drawable.barcelonaimage),
-                contentDescription = "Cathedral",
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(12.dp)
-                    .background(
-                        Color(0x66000000),
-                        shape = RoundedCornerShape(4.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_pin),
-                    contentDescription = "Location pin",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = "Barcelona, Spain",
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
-            }
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.circleimage),
-                contentDescription = "User Image",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-
-            Text(
-                "Biel Morro",
-                color = Color.White,
-//                modifier = Modifier.padding(start = 8.dp)
-            )
-
-            Row() {
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-//                    modifier = Modifier.padding(horizontal = 5.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_download),
-                        contentDescription = "Download",
-                        modifier = Modifier
-                            .size(26.dp)
-                    )
-                }
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-//                    modifier = Modifier.padding(horizontal = 5.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_heart),
-                        contentDescription = "Heart",
-                        modifier = Modifier
-                            .size(26.dp)
-
-                    )
-                }
-                Button(
-                    onClick = { },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-//                    modifier = Modifier.padding(horizontal = 5.dp)
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_bookmark),
-                        contentDescription = "Bookmark",
-                        modifier = Modifier
-                            .size(32.dp)
-                    )
-                }
-            }
-        }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .padding(bottom = 32.dp)
-                .padding(horizontal = 32.dp),
-//                .padding(top = 20.dp),
-            thickness = 1.dp,
-            color = Color.DarkGray
-        )
-        //        Spacer(Modifier.height(16.dp))
-
-        Spacer(Modifier.height(8.dp))
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            MetricRow(
-                leftTitle = stringResource(R.string.camera),
-                leftValue = stringResource(R.string.camera_model),
-                rightTitle = stringResource(R.string.Aperture),
-                rightValue = stringResource(R.string.Aperture_number),
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            MetricRow(
-                leftTitle = stringResource(R.string.Focal_Length),
-                leftValue = stringResource(R.string.Focal_Length_number),
-                rightTitle = stringResource(R.string.Shutter_Speed),
-                rightValue = stringResource(R.string.Shutter_Speed_number),
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            MetricRow(
-                leftTitle = stringResource(R.string.ISO),
-                leftValue = stringResource(R.string.ISO_number),
-                rightTitle = stringResource(R.string.Dimensions),
-                rightValue = stringResource(R.string.Dimensions_number),
-            )
-            HorizontalDivider(
-                modifier = Modifier.padding(32.dp),
-                thickness = 1.dp,
-                color = Color.DarkGray
-            )
-        }
-
-//        Spacer(Modifier.height(24.dp))
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-
-            Column() {
-                Text(stringResource(R.string.Views), color = Color.White)
-                Text(stringResource(R.string.Views_count), color = Color.White)
-            }
-//
-            Column() {
-                Text(stringResource(R.string.Downloads), color = Color.White)
-                Text(stringResource(R.string.Download_count), color = Color.White)
-            }
-
-            Column() {
-                Text(stringResource(R.string.Likes), color = Color.White)
-                Text(stringResource(R.string.Like_count), color = Color.White)
-            }
-        }
-        HorizontalDivider(
-            modifier = Modifier.padding(32.dp),
-            thickness = 1.dp,
-            color = Color.DarkGray
-        )
-
-//        Spacer(Modifier.weight(1f))
-
-        Row (modifier = Modifier
-            .padding(start = 16.dp, end = 26.dp)){
-            // Next button
-            Button(
-                onClick = onNext,
-                modifier = Modifier
-//                .fillMaxWidth()
-                    .padding(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color.White)
-            ) {
-                Text("Barcelona")
-
-
-            }
-            Button(
-                onClick = onNext,
-                modifier = Modifier
-//                .fillMaxWidth()
-                    .padding(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color.White)
-            ) {
-                Text(
-                    text = "Spain"
-                )
-
-            }
-        }
+    override fun onDataFetchedFailed(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun MetricRow(
-    leftTitle: String,
-    leftValue: String,
-    rightTitle: String,
-    rightValue: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            Text(text = leftTitle, color = Color.LightGray, fontSize = 12.sp)
-            Text(text = leftValue, color = Color.White, fontSize = 14.sp)
-        }
-        Column {
-            Text(
-                text = rightTitle,
-                color = Color.LightGray,
-                fontSize = 12.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Right
-            )
-            Text(
-                text = rightValue,
-                color = Color.White,
-                fontSize = 14.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Right
-            )
-        }
-    }
-}
-
-
-@Composable
-fun SecondScreen(onBack: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Second Screen!", color = Color.White)
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = onBack) {
-            Text("Go Back")
-        }
+fun GreetingPreview() {
+    UnsplashTheme {
+        AboutScreen()
     }
 }

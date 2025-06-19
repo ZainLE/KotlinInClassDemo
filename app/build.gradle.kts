@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cmota.unsplash"
+    namespace = "com.example.myapplication"
     compileSdk = 36
 
     defaultConfig {
@@ -53,7 +53,7 @@ dependencies {
 
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
-    implementation(libs.androidx.navigation.compose.jvmstubs)
+    implementation(libs.androidx.navigation.compose)
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     testImplementation(libs.junit)
