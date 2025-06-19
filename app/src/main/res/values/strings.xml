@@ -1,4 +1,34 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="firstscreen_text">This is a showcase app using Jetpack Compose with the Unsplash API</string>
+
+    <string name="camera">Camera</string>
+    <string name="camera_model">Nikon D3200</string>
+
+    <string name="Aperture">Aperture</string>
+    <string name="Aperture_number">f/5.0</string>
+
+    <string name="Focal_Length">Focal Length</string>
+    <string name="Focal_Length_number">18.00 mm</string>
+
+    <string name="Shutter_Speed">Shutter Speed</string>
+    <string name="Shutter_Speed_number">1/125s</string>
+
+    <string name="ISO">ISO</string>
+    <string name="ISO_number">100</string>
+
+    <string name="Dimensions">Dimensions</string>
+    <string name="Dimensions_number">3906 x 4882</string>
+
+    <string name="Views">Views</string>
+    <string name="Views_count">8.8M</string>
+
+    <string name="Downloads">Downloads</string>
+    <string name="Download_count">99.1K</string>
+
+    <string name="Likes">Likes</string>
+    <string name="Like_count">1.8K</string>
+
+
+
 </resources>
