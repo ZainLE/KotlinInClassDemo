@@ -55,14 +55,8 @@ class DetailsActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier.padding(innerPadding),
                         ) {
-                            DetailsScreen(
-                                image = image,
-                                onAction = { resId ->
-                                    val intent = Intent(this@DetailsActivity, ImageActivity::class.java)
-                                    intent.putExtra("image", resId)
-                                    startActivity(intent)
-                                }
-                            )
+                            val photoId = intent.getStringExtra("photoId") ?: ""
+                            DetailsScreen(photoId = photoId)
                         }
                     }
                 )

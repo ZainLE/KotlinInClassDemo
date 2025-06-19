@@ -41,7 +41,7 @@ import com.example.myapplication.data.UnsplashItem
 @Composable
 fun MainScreen(
     images: List<UnsplashItem>,
-    onAction: (Int) -> Unit
+    onAction: (String) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp)
@@ -78,7 +78,7 @@ fun MainScreen(
                     .height(250.dp)
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color.Blue.copy(alpha = 0.25f))
-                    .clickable(onClick = { onAction(R.drawable.ic_kotlin) })
+                    .clickable(onClick = { onAction(image.id ?: "") })
             ) {
                 Surface {
                     val painter = rememberAsyncImagePainter(

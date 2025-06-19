@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity(), UnsplashResult {
                     },
                     floatingActionButton = {
                         FloatingActionButton(
-                            onClick = { Toast.makeText(this@MainActivity, "I ❤️Android", Toast.LENGTH_SHORT).show() }
+                            onClick = { Toast.makeText(this@MainActivity, "Add Something", Toast.LENGTH_SHORT).show() }
                         ) {
                             Icon(
                                 Icons.Default.Add,
@@ -75,9 +75,9 @@ class MainActivity : ComponentActivity(), UnsplashResult {
                     ) {
                         MainScreen(
                             images = images.value,
-                            onAction = { image ->
+                            onAction = { photoId ->
                                 val intent = Intent(this@MainActivity, DetailsActivity::class.java)
-                                intent.putExtra("image", image)
+                                intent.putExtra("photoId", photoId)
                                 startActivity(intent)
                             }
                         )

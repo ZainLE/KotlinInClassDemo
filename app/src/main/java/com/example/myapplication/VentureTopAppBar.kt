@@ -25,8 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Import your R class if your drawables are in res/drawable
-// import com.yourpackage.R // Replace com.yourpackage with your actual package name
 
 @Composable
 fun VentureTopAppBar(onCloseClick: () -> Unit) {
@@ -36,25 +34,20 @@ fun VentureTopAppBar(onCloseClick: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Replace with your actual logo drawable
-//        Image(
-//            painter = painterResource(id = R.drawable.venture.logo), // Assuming you have venture_logo.png
-//            contentDescription = "Venture Logo",
-//            modifier = Modifier.size(28.dp)
-//        )
+
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "Venture",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black // Or your desired text color
+            color = Color.Black
         )
-        Spacer(modifier = Modifier.weight(1f)) // Pushes the close button to the end
+        Spacer(modifier = Modifier.weight(1f))
         IconButton(onClick = onCloseClick) {
             Icon(
                 imageVector = Icons.Filled.Close,
                 contentDescription = "Close",
-                tint = Color.Black // Or your desired icon color
+                tint = Color.Black
             )
         }
     }

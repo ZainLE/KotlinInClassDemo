@@ -1,108 +1,123 @@
 package com.example.myapplication.ui.theme
 
-
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
+import com.example.myapplication.api.UnsplashProvider
+import com.example.myapplication.data.UnsplashItem
+import coil3.compose.AsyncImage
 
 @Composable
 fun DetailsScreen(
-    @DrawableRes image: Int,
-    onAction: (Int) -> Unit = {}
+    photoId: String,
+    onAction: (() -> Unit)? = null
 ) {
-    Column {
-        Image(
-            painter = painterResource(image),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    onAction(image)
-                }),
-            contentScale = ContentScale.Crop,
-            contentDescription = stringResource(R.string.bcn_description)
-        )
+    var unsplashItem by remember { mutableStateOf<UnsplashItem?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(false) }
 
-        Row {
-            AddPhotoInfoRow(
-                title1 = R.string.camera,
-                subtitle1 = R.string.camera_model,
+    LaunchedEffect(photoId) {
+        UnsplashProvider().fetchPhotoById(photoId, {
+            unsplashItem = it
+            loading = false
+        }, {
+            error = it
+            loading = false
+        })
+    }
 
-                title2 = R.string.Aperture,
-                subtitle2 = R.string.Aperture_number
-            )
+    when {
+        loading -> {
+            Text(text = "Loading...")
         }
-
-        Row {
-            AddPhotoInfoRow(
-                title1 = R.string.Focal_Length,
-                subtitle1 = R.string.Focal_Length_number,
-                title2 = R.string.Shutter_Speed,
-                subtitle2 = R.string.Shutter_Speed_number
-            )
+        error != null -> {
+            Text(text = error ?: "Unknown error")
         }
-
-        Row {
-            AddPhotoInfoRow(
-                title1 = R.string.ISO,
-                subtitle1 = R.string.ISO_number,
-                title2 = R.string.Dimensions,
-                subtitle2 = R.string.Dimensions_number
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            thickness = 1.dp,
-            color = Color.LightGray
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(stringResource(R.string.Views))
-
-                Text(stringResource(R.string.Views_count))
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(stringResource(R.string.Downloads))
-
-                Text(stringResource(R.string.Download_count))
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(stringResource(R.string.Likes))
-
-                Text(stringResource(R.string.Like_count))
+        unsplashItem != null -> {
+            val item = unsplashItem!!
+            Column {
+                val imageUrl = item.urls?.regular
+                if (imageUrl != null) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = item.description ?: "Photo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .let { if (expanded) it else it.height(250.dp) }
+                            .clickable { expanded = !expanded },
+                        contentScale = if (expanded) ContentScale.Fit else ContentScale.Crop
+                    )
+                }
+                Row {
+                    AddPhotoInfoRow(
+                        title1 = R.string.camera,
+                        subtitle1 = item.exif?.model ?: "-",
+                        title2 = R.string.Aperture,
+                        subtitle2 = item.exif?.aperture ?: "-"
+                    )
+                }
+                Row {
+                    AddPhotoInfoRow(
+                        title1 = R.string.Focal_Length,
+                        subtitle1 = item.exif?.focal_length ?: "-",
+                        title2 = R.string.Shutter_Speed,
+                        subtitle2 = item.exif?.exposure_time ?: "-"
+                    )
+                }
+                Row {
+                    AddPhotoInfoRow(
+                        title1 = R.string.ISO,
+                        subtitle1 = item.exif?.iso?.toString() ?: "-",
+                        title2 = R.string.Dimensions,
+                        subtitle2 = if (item.width != null && item.height != null) "${item.width} x ${item.height}" else "-"
+                    )
+                }
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    thickness = 1.dp,
+                    color = Color.LightGray
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(stringResource(R.string.Downloads))
+                        Text(item.downloads?.toString() ?: "-")
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(stringResource(R.string.Likes))
+                        Text(item.likes?.toString() ?: "-")
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(stringResource(R.string.camera))
+                        Text(item.exif?.make ?: "-")
+                    }
+                }
+                Text(text = item.description ?: "-", modifier = Modifier.padding(8.dp))
+                Text(text = item.location?.city ?: item.location?.country ?: "-", modifier = Modifier.padding(8.dp))
+                Text(text = item.tags?.joinToString { it.title ?: "-" } ?: "-", modifier = Modifier.padding(8.dp))
             }
         }
     }
@@ -111,12 +126,10 @@ fun DetailsScreen(
 @Composable
 fun AddPhotoInfoRow(
     @StringRes title1: Int,
-    @StringRes subtitle1: Int,
-
+    subtitle1: String,
     @StringRes title2: Int,
-    @StringRes subtitle2: Int
+    subtitle2: String
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -133,10 +146,9 @@ fun AddPhotoInfoRow(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = stringResource(id = subtitle1)
+                text = subtitle1
             )
         }
-
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -147,7 +159,7 @@ fun AddPhotoInfoRow(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = stringResource(id = subtitle2)
+                text = subtitle2
             )
         }
     }
@@ -156,5 +168,5 @@ fun AddPhotoInfoRow(
 @Composable
 @Preview
 fun PreviewDetailsScreen() {
-    DetailsScreen(R.drawable.barcelonaimage)
-    }
+    DetailsScreen("barcelonaimage")
+}
